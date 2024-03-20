@@ -45,7 +45,7 @@ class ParentNode(HTMLNode):
         if self.tag is None:
             raise ValueError
 
-        if self.children is None or len(self.children) < 1:
+        if self.children is None:
             raise ValueError
 
         result = f"<{self.tag}>"

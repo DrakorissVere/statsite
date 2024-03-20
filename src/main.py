@@ -1,5 +1,6 @@
 import os
 import shutil
+from markdown import md_to_html_nodes
 
 
 def prepare_public():
@@ -35,8 +36,33 @@ def copy_static(src, dest):
             shutil.copy2(s, d)
 
 
+def extract_title(markdown):
+    title = None
+    for line in markdown.split('\n'):
+        if line.startswith('# '):
+            title = line[2:]
+            break
+    if title is None:
+        raise Exception('Title not found')
+    return title
+
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page {from_path} -> {dest_path}")
+    markdown = open(from_path, 'r').read()
+    template = open(template_path, 'r').read()
+    title = extract_title(markdown)
+    nodes = md_to_html_nodes(markdown)
+    content = template.replace('{{ Title }}', title)
+    content = content.replace('{{ Content }}', nodes.to_html())
+    with open(dest_path, 'w') as f:
+        f.write(content)
+
+
 def main():
     prepare_public()
+    generate_page('index.md', 'template.html',
+                  'public/index.html')
 
 
 main()
