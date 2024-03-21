@@ -20,8 +20,8 @@ def prepare_public():
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-    static_dir = os.path.join(current_dir, 'static')
-    copy_static(static_dir, public_dir)
+    # static_dir = os.path.join(current_dir, 'static')
+    # copy_static(static_dir, public_dir)
 
 
 def copy_static(src, dest):
@@ -59,10 +59,24 @@ def generate_page(from_path, template_path, dest_path):
         f.write(content)
 
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for filename in os.listdir(dir_path_content):
+        file_path = os.path.join(dir_path_content, filename)
+        dest_path = os.path.join(
+            dest_dir_path, filename.replace('.md', '.html'))
+        if os.path.isdir(file_path):
+            if not os.path.exists(dest_path):
+                os.mkdir(dest_path)
+            generate_pages_recursive(file_path, template_path, dest_path)
+        else:
+            generate_page(file_path, template_path, dest_path)
+
+
 def main():
     prepare_public()
-    generate_page('index.md', 'template.html',
-                  'public/index.html')
+    generate_pages_recursive('content', 'template.html', 'public')
+    # generate_page('index.md', 'template.html',
+    #              'public/index.html')
 
 
 main()
